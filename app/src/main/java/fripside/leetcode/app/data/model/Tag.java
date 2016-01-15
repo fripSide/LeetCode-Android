@@ -23,11 +23,13 @@ public class Tag extends Model {
     @Column(name = "Url")
     public String url;
 
-    public void saveOrUpdate() {
+    public Tag saveOrUpdate() {
         Tag tag = new Select().from(Tag.class).where("Content = ?", content).executeSingle();
         if (tag == null) {
-            save();
+            tag = this;
+            tag.save();
         }
+        return tag;
     }
 
     @Override

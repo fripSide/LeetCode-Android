@@ -2,7 +2,7 @@
 """
 python 3
 python 2: 请把59行改成content.encode("utf-8")
-
+抓到257道题
 """
 __author__ = 'fripSide'
 
@@ -26,11 +26,11 @@ PROBLEM_TAG = re.compile('<a class="btn btn-xs btn-primary" href="([^\"]+)">([^<
 if not os.path.exists(DIR):
     os.mkdir(DIR)
 
-one = "https://leetcode.com/problems/reverse-words-in-a-string-ii/"
+one = "https://leetcode.com/problems/container-with-most-water/"
 
 PROBLEMS = {
-    "tags": [],
-    "problems": []
+    "Tags": [],
+    "Problems": []
 }
 
 def parser_problem_set():
@@ -43,8 +43,8 @@ def parser_problem_set():
         title = item[1]
         if "problems/" in link:
             problems.append({
-                "url": BASE + link,
-                "title": title
+                "Url": BASE + link,
+                "Title": title
             })
 
             print(BASE + link)
@@ -53,8 +53,7 @@ def parser_problem_set():
 
 
 def save_problem(content, info):
-    info["content"] = content
-    name = DIR + info["no"] + ".html"
+    name = DIR + str(info["No"]) + ".html"
     with open(name, "w") as fp:
         fp.write(content)
 
@@ -75,9 +74,9 @@ def get_problem(url):
     difficulty = PROBLEM_DIFFICULTY.search(r.text).group(1)
 
     p1 = r.text.find('<div class="question-content">')
-    p2 = r.text.find('<p><b>Credits:')
+    p2 = r.text.find('<p><a href="/subscribe/">Subscribe</a>')
     # print(p1, p2)
-    content = r.text[p1 + 30:p2].strip()
+    content = r.text[p1 + 30:p2 - 25].strip()
     print(p1, p2, content)
 
     similar = []
@@ -87,44 +86,47 @@ def get_problem(url):
         if "problems" in tag[0]:
             name = tag[1][4:]
             similar.append({
-                "url": BASE + tag[0],
-                "title": name
+                "Url": BASE + tag[0],
+                "Title": name.strip()
             })
         if "tag" in tag[0]:
             tt = {
-                "url": BASE + tag[0],
-                "title": tag[1]
+                "Url": BASE + tag[0],
+                "Content": tag[1]
             }
             tags.append(tt)
             add = True
-            for t in PROBLEMS["tags"]:
-                if t["title"] == tag[1]:
+            for t in PROBLEMS["Tags"]:
+                if t["Content"] == tag[1]:
                     add = False
             if add:
-                PROBLEMS["tags"].append(tt)
+                PROBLEMS["Tags"].append(tt)
 
     info = {
-        "no": no,
-        "title": title,
-        "accepted": accept,
-        "submission": submission,
-        "difficulty": difficulty,
-        "tags": tags,
-        "similar": similar
+        "No": int(no),
+        "Title": title,
+        "Accept": int(accept),
+        "Submission": int(submission),
+        "Difficulty": difficulty,
+        "Tags": tags,
+        "Url": url,
+        "Similar": similar
     }
     print(info)
-    PROBLEMS["problems"].append(info)
+    PROBLEMS["Problems"].append(info)
     save_problem(content, info)
     logging.info("Download: " + url)
 
 
 def pipeline():
     # get_problem(one)
+    # with open("problems1.json", "w") as fp:
+    #     fp.write(json.dumps(PROBLEMS))
     # return
     problems = parser_problem_set()
     # print(problems)
     for p in problems:
-        get_problem(p["url"])
+        get_problem(p["Url"])
     with open("problems.json", "w") as fp:
         fp.write(json.dumps(PROBLEMS))
 

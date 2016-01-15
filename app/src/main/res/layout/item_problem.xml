@@ -1,24 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
     android:layout_height="55dp">
     <TextView android:id="@+id/tv_title"
         android:layout_width="match_parent"
-        android:layout_height="20dp"
+        android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
-        android:layout_marginBottom="5dp"
+        android:layout_marginBottom="2dp"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
         android:text="Problem Title"/>
 
     <TextView android:id="@+id/tv_accept_rate"
         android:layout_below="@+id/tv_title"
         android:layout_width="150dp"
-        android:layout_height="15dp"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:layout_height="wrap_content"
         android:text="Accept Rate: 17%"/>
     <TextView android:id="@+id/tv_difficulty"
         android:layout_below="@+id/tv_title"
         android:layout_toRightOf="@+id/tv_accept_rate"
-        android:layout_width="150dp"
-        android:layout_height="15dp"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
         android:text="Difficulty: Hard"/>
+    <View
+        android:layout_alignParentBottom="true"
+        android:layout_marginTop="54dp"
+        android:background="@color/divider_gray"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"/>
 </RelativeLayout>

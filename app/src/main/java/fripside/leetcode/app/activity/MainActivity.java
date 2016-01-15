@@ -2,17 +2,22 @@ package fripside.leetcode.app.activity;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import java.util.Collections;
+import com.activeandroid.query.Select;
+
+import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import fripside.leetcode.app.R;
+import fripside.leetcode.app.adpter.ProblemListAdapter;
 import fripside.leetcode.app.data.model.Pivot;
 import fripside.leetcode.app.data.model.Problem;
+import fripside.leetcode.app.data.model.Similar;
 import fripside.leetcode.app.data.model.Tag;
 import fripside.leetcode.app.utils.L;
 
@@ -23,12 +28,25 @@ public class MainActivity extends AppCompatActivity {
     @Bind(R.id.rev_problems)
     RecyclerView revProblems;
 
+    ProblemListAdapter problemListAdapter;
+
+    private List<Problem> problems;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-        testDb();
+//        testDb();
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+        revProblems.setLayoutManager(linearLayoutManager);
+//        ProblemListAdapter.DividerLine dividerLine = new ProblemListAdapter.DividerLine(ProblemListAdapter.DividerLine.VERTICAL);
+//        dividerLine.setSize(1);
+//        dividerLine.setColor(0xFFDDDDDD);
+//        revProblems.addItemDecoration(dividerLine);
+//        revProblems.addItemDecoration(new Div(this, DividerItemDecoration.VERTICAL_LIST));
+        loadData();
     }
 
     @Override
@@ -59,26 +77,43 @@ public class MainActivity extends AppCompatActivity {
         L.d(this.getClass().getSimpleName(), "onDestroy");
     }
 
+    private void loadData() {
+        problems = new Select().from(Problem.class).execute();
+        L.d("testDb", "" + problems.size());
+        for (Problem problem : problems) {
+            L.d("testDb", problem.title);
+        }
+        problemListAdapter = new ProblemListAdapter(this, problems);
+        revProblems.setAdapter(problemListAdapter);
+        problemListAdapter.notifyDataSetChanged();
+    }
+
     private void testDb() {
         Problem problem = new Problem();
         problem.title = "问题测试";
         problem.isSolve = true;
         problem.isStar = true;
         problem.accept = 100;
+        problem.url = "SSS";
         problem.submission = 123132;
-//        problem.similar = Collections.singletonList("问题测试");
+        problem.content = "html content C++";
         problem.save();
         Tag tag = new Tag("ABC");
-        tag.saveOrUpdate();
+        tag = tag.saveOrUpdate();
         new Pivot(problem, tag).save();
         tag = new Tag("CDE");
         tag.content = "CDE";
-        tag.saveOrUpdate();
+        tag = tag.saveOrUpdate();
         new Pivot(problem, tag).save();
-        L.d("testDb", problem.tags().toString());
+        L.d("testDb", problem.tags().toString()); // except: [ABC, CDE]
         for (Tag pv : problem.tags()) {
             L.d("testDb", pv.toString());
         }
-
+        Problem B = new Problem();
+        B.title = "相似问题";
+        B.save();
+        new Similar(problem, B).save();
+        L.d("testDb", problem.similar().toString());
+        L.d("testDb", "Equal: " + (B.getId() ==  problem.similar().get(0).getId())); // except: true
     }
 }
